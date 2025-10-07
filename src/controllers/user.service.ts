@@ -1,27 +1,127 @@
-import { Response } from "express";
-import { Service } from "../models/Service";
-import { ServiceDetail } from "../models/serviceDetail";
+import { Request, Response } from "express";
+import { CompayService } from "../services/user.service";
+import { serviceService } from "../services/service.service";
 
-export const userService = async (req: any, res: Response) => {
+export const createUserService = async (req: Request, res: Response) => {
   try {
-    const { price, duration, serviceId } = req.body;
+    const { price, duration, serviceId, companyId } = req.body;
 
-    const service = await Service.findById(serviceId);
-    if (!service) {
-      return res.status(404).json({ error: "سرویس یافت نشد" });
+    if (!price || !duration || !serviceId || !companyId) {
+      return res.status(400).json({ error: "تمام فیلدهای لازم را وارد کنید." });
     }
 
-    const newDetail = new ServiceDetail({
+    const newService = await CompayService.createService({
       price,
       duration,
       serviceId,
+      companyId,
     });
 
-    await newDetail.save();
+    res.status(201).json(newService);
+  } catch (err) {
+    res.status(500).json({ error: "خطای داخلی سرور" });
+  }
+};
 
-    res.status(200).json(newDetail);
+export const getAllServicesByCompanyId = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { companyId } = req.params;
+    const userServices = await CompayService.getAllServicesByCompanyId(
+      companyId
+    );
+
+    const services = await serviceService.getServices({
+      ids: userServices.map((us) => us.serviceId),
+    });
+
+    const response = userServices.map((us) => ({
+      price: us.price ?? "-",
+      duration: us.duration ?? "-",
+      serviceId: us.serviceId,
+      companyId: us.companyId,
+      title: services.find((s) => s._id.toString() === us.serviceId)?.title,
+    }));
+    // const services = userServices.map(async (us) => {
+    //   const service = await serviceService.getServicesByServiceId(us.serviceId);
+    //   return {
+    //     price: us.price,
+    //     duration: us.duration,
+    //     serviceId: us.serviceId,
+    //     title: service.title,
+    //   };
+    // });
+    console.log(response);
+
+    if (!response.length) {
+      return res
+        .status(404)
+        .json({ message: "هیچ سرویسی برای این شرکت یافت نشد." });
+    }
+
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json({ error: "خطای داخلی سرور" });
+  }
+};
+export const updateUserServicesBulk = async (req: Request, res: Response) => {
+  try {
+    const { serviceIds, data } = req.body;
+    const { companyId } = req.params;
+
+    const results = await CompayService.updateServicesBulk(
+      companyId,
+      serviceIds,
+      data
+    );
+
+    res.status(200).json({
+      message: "سرویس‌ها با موفقیت به‌روزرسانی شدند.",
+      data: results,
+    });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: "خطای داخلی سرور" });
+  }
+};
+
+export const updateService = async (req: Request, res: Response) => {
+  try {
+    const { serviceIds, data } = req.body;
+    const { companyId } = req.params;
+
+    const results = await CompayService.updateService(
+      companyId,
+      serviceIds,
+      data
+    );
+
+    res.status(200).json({
+      message: "سرویس‌ها با موفقیت به‌روزرسانی شدند.",
+      data: results,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "خطای داخلی سرور" });
+  }
+};
+
+export const deleteUserService = async (req: Request, res: Response) => {
+  try {
+    const { serviceId, companyId } = req.params;
+
+    const deleted = await CompayService.deleteService(serviceId, companyId);
+
+    if (!deleted) {
+      return res
+        .status(404)
+        .json({ message: "سرویس یافت نشد یا قبلاً حذف شده است." });
+    }
+
+    res.status(200).json({ message: "سرویس با موفقیت حذف شد." });
+  } catch (err) {
     res.status(500).json({ error: "خطای داخلی سرور" });
   }
 };

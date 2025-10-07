@@ -1,23 +1,47 @@
-import { Response } from "express";
-import { Time } from "../models/Time";
+import { Request, Response } from "express";
+import { timeService } from "../services/time.service";
 
-export const addAvailableTime = async (req: any, res: Response) => {
+export const addAvailableTime = async (req: Request, res: Response) => {
   try {
     const { companyId, day, times } = req.body;
+    const result = await timeService.addOrUpdateAvailableTime(
+      companyId,
+      day,
+      times
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "خطای داخلی سرور" });
+  }
+};
 
-    let timeAvailable = await Time.findOne({ companyId, day });
+export const getTimeByDay = async (req: Request, res: Response) => {
+  try {
+    const { companyId } = req.params;
 
-    if (!timeAvailable) {
-      timeAvailable = new Time({ companyId, day, times });
-    } else {
-      timeAvailable.times = times;
+    const times = await timeService.getByCompanyByDay(companyId);
+
+    res.status(200).json(times);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "خطای داخلی سرور" });
+  }
+};
+
+export const getTimeByCompanyAndDay = async (req: Request, res: Response) => {
+  try {
+    const { companyId, day } = req.params;
+
+    const time = await timeService.getByCompanyAndDay(companyId, day);
+
+    if (!time) {
+      return res.status(404).json({ message: "زمانی برای این روز پیدا نشد" });
     }
 
-    await timeAvailable.save();
-
-    res.status(200).json(timeAvailable);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "خطای داخلی سرور" });
+    res.status(200).json(time);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "خطای داخلی سرور" });
   }
 };
