@@ -28,35 +28,38 @@ export const CompayService = {
   async updateService(
     serviceId: string,
     companyId: string,
-    data: Partial<IUserService>
+    price: string,
+    duration: string
   ) {
-    return await UserService.findOneAndUpdate({ serviceId, companyId }, data, {
-      new: true,
-    });
+    return await UserService.findOneAndUpdate(
+      { serviceId, companyId },
+      { $set: { price, duration } }, 
+      { new: true } 
+    );
   },
-async updateServicesBulk(
-  companyId: string,
-  serviceIds: string[],
-  data?: Partial<IUserService>
-) {
-  const results = await Promise.all(
-    serviceIds.map(async (serviceId) => {
-      const existing = await UserService.findOne({ serviceId, companyId });
-      if (existing) {
-        Object.assign(existing, data);
-        return await existing.save();
-      } else {
-        const newService = new UserService({
-          serviceId,
-          companyId,
-          ...data,
-        });
-        return await newService.save();
-      }
-    })
-  );
 
-  return results;
-},
+  async updateServicesBulk(
+    companyId: string,
+    serviceIds: string[],
+    data?: Partial<IUserService>
+  ) {
+    const results = await Promise.all(
+      serviceIds.map(async (serviceId) => {
+        const existing = await UserService.findOne({ serviceId, companyId });
+        if (existing) {
+          Object.assign(existing, data);
+          return await existing.save();
+        } else {
+          const newService = new UserService({
+            serviceId,
+            companyId,
+            ...data,
+          });
+          return await newService.save();
+        }
+      })
+    );
 
+    return results;
+  },
 };

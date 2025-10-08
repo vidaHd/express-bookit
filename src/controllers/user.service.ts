@@ -89,24 +89,26 @@ export const updateUserServicesBulk = async (req: Request, res: Response) => {
 
 export const updateService = async (req: Request, res: Response) => {
   try {
-    const { serviceIds, data } = req.body;
+    const { serviceId, price, duration } = req.body;
     const { companyId } = req.params;
 
-    const results = await CompayService.updateService(
+    const result = await CompayService.updateService(
+      serviceId,
       companyId,
-      serviceIds,
-      data
+      price,
+      duration
     );
 
     res.status(200).json({
-      message: "سرویس‌ها با موفقیت به‌روزرسانی شدند.",
-      data: results,
+      message: "سرویس با موفقیت به‌روزرسانی شد.",
+      data: result,
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "خطای داخلی سرور" });
   }
 };
+
 
 export const deleteUserService = async (req: Request, res: Response) => {
   try {
