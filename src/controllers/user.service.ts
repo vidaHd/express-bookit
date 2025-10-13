@@ -38,29 +38,12 @@ export const getAllServicesByCompanyId = async (
     });
 
     const response = userServices.map((us) => ({
-      price: us.price ?? "-",
-      duration: us.duration ?? "-",
+      price: us.price ?? "تماس بگیرید",
+      duration: us.duration ?? "تماس بگیرید",
       serviceId: us.serviceId,
       companyId: us.companyId,
       title: services.find((s) => s._id.toString() === us.serviceId)?.title,
     }));
-    // const services = userServices.map(async (us) => {
-    //   const service = await serviceService.getServicesByServiceId(us.serviceId);
-    //   return {
-    //     price: us.price,
-    //     duration: us.duration,
-    //     serviceId: us.serviceId,
-    //     title: service.title,
-    //   };
-    // });
-    console.log(response);
-
-    if (!response.length) {
-      return res
-        .status(404)
-        .json({ message: "هیچ سرویسی برای این شرکت یافت نشد." });
-    }
-
     res.status(200).json(response);
   } catch (err) {
     res.status(500).json({ error: "خطای داخلی سرور" });

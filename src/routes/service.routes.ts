@@ -1,5 +1,5 @@
 import express from "express";
-import { AllService, createService } from "../controllers/Service.controller";
+import { AllService, createService } from "../controllers/service.controller";
 
 const router = express.Router();
 
