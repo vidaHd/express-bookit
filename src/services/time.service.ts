@@ -11,17 +11,21 @@ const WEEK_DAY_KEYS = [
 ];
 
 export const timeService = {
- async addOrUpdateAvailableTimesBulk(
+  async addOrUpdateAvailableTimesBulk(
     companyId: string,
     timesByDay: Record<string, string[]>
   ) {
-    const ops = Object.entries(timesByDay).map(([day, times]) => ({
-      updateOne: {
-        filter: { companyId, day },
-        update: { $set: { times } },
-        upsert: true,
-      },
-    }));
+    if (!companyId || typeof timesByDay !== "object") return null;
+
+    const ops = Object.entries(timesByDay)
+      .filter(([day, times]) => WEEK_DAY_KEYS.includes(day) && Array.isArray(times))
+      .map(([day, times]) => ({
+        updateOne: {
+          filter: { companyId, day },
+          update: { $set: { times } },
+          upsert: true,
+        },
+      }));
 
     if (ops.length > 0) {
       await Time.bulkWrite(ops);
@@ -35,15 +39,14 @@ export const timeService = {
   },
 
   async getByCompanyAndDay(companyId: string, day: string) {
+    if (!companyId || !day || !WEEK_DAY_KEYS.includes(day)) return null;
     return await Time.findOne({ companyId, day });
   },
 
- async getByCompanyByDay(companyId: string) {
-    return await Time.findOne({ companyId });
-  },
-
   async delete(companyId: string, day: string) {
-    return await Time.findOneAndDelete({ companyId, day });
+    if (!companyId || !day || !WEEK_DAY_KEYS.includes(day)) return false;
+    const deleted = await Time.findOneAndDelete({ companyId, day });
+    return deleted ? true : false;
   },
 
   async getAllByCompany(companyId: string) {
@@ -61,5 +64,5 @@ export const timeService = {
     });
 
     return result;
-  },  
+  },
 };

@@ -1,59 +1,25 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { User } from "../models/User";
+import { AuthService } from "../services/auth.service";
 
-const JWT_SECRET = "bookitSecretKey";
-
-// Login
-export const login = async (req: any, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   try {
-    const { password, mobileNumber } = req.body;
-
-    const { _id } = req.body;
-
-    const user = await User.findById({ _id });
-    if (!user) return res.status(400).json({ error: "نام کاربری اشتباه است" });
-
-    if (user.mobileNumber !== mobileNumber) {
-      return res.status(400).json({ error: "شماره موبایل اشتباه است" });
-    }
-    
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "رمز عبور اشتباه است" });
-
-    const { password: _, __v: __, ...userWithoutPass } = user.toObject();
-
-    const token = jwt.sign(
-      { id: user._id, name: user.name, familyName: user.familyName },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.status(200).json({ user: userWithoutPass, token });
+    const { _id, mobileNumber, password } = req.body;
+    const { user, token } = await AuthService.login(_id, mobileNumber, password);
+    res.status(200).json({ message: req.t("auth.login_success"), user, token });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    const errorMsg = err.message ? req.t(`auth.${err.message}`) : req.t("errors.internal");
+    res.status(400).json({ error: errorMsg });
   }
 };
 
-// register
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { password, familyName, mobileNumber, name } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      name,
-      familyName,
-      mobileNumber,
-      password: hashedPassword,
-    });
-
-    await newUser.save();
-    const { password: _, __v, ...userWithoutPass } = newUser.toObject();
-
-    res.status(201).json({ message: "User created", user: userWithoutPass });
+    const { name, familyName, mobileNumber, password } = req.body;
+    const user = await AuthService.signup({ name, familyName, mobileNumber, password });
+    res.status(201).json({ message: req.t("auth.signup_success"), user });
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    console.error(err);
+    res.status(400).json({ error: req.t("errors.internal") });
   }
 };

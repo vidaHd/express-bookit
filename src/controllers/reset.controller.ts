@@ -4,19 +4,18 @@ import { User } from "../models/User";
 import Kavenegar from "kavenegar";
 
 const api = Kavenegar.KavenegarApi({
-  apikey:
-    "645834377058767159486E716D632F4C46656D42374331545A485176362B4F554B5171387A6530595165453D",
+  apikey: process.env.KAVENEGAR_API_KEY || "",
 });
 
-export const requestResetPassword = async (req: any, res: Response) => {
+export const requestResetPassword = async (req: Request, res: Response) => {
   try {
     const { oldPassword, newPassword, name } = req.body;
 
     const user = await User.findOne({ name });
-    if (!user) return res.status(404).json({ error: "کاربر یافت نشد" });
+    if (!user) return res.status(404).json({ error: req.t("reset.user_not_found") });
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch) return res.status(400).json({ error: "رمز قبلی اشتباه است" });
+    if (!isMatch) return res.status(400).json({ error: req.t("reset.wrong_old_password") });
 
     const code = Math.floor(1000 + Math.random() * 9000).toString();
     user.resetCode = code;
@@ -31,26 +30,27 @@ export const requestResetPassword = async (req: any, res: Response) => {
       },
       (_response, status) => {
         if (status !== 200) {
-          return res.status(500).json({ error: "ارسال پیامک ناموفق بود" });
+          return res.status(500).json({ error: req.t("reset.sms_failed") });
         } else {
-          return res.json({ message: "کد تغییر رمز ارسال شد" });
+          return res.json({ message: req.t("reset.sms_sent") });
         }
       }
     );
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: req.t("reset.internal_error") });
   }
 };
 
-export const checkResetPassword = async (req: any, res: Response) => {
+export const checkResetPassword = async (req: Request, res: Response) => {
   try {
     const { code, name } = req.body;
 
     const user = await User.findOne({ name });
-    if (!user) return res.status(404).json({ error: "کاربر یافت نشد" });
+    if (!user) return res.status(404).json({ error: req.t("reset.user_not_found") });
 
     if (user.resetCode !== code) {
-      return res.status(400).json({ error: "کد اشتباه است" });
+      return res.status(400).json({ error: req.t("reset.wrong_code") });
     }
 
     user.password = user.newPasswordTemp ?? "";
@@ -58,8 +58,9 @@ export const checkResetPassword = async (req: any, res: Response) => {
     user.newPasswordTemp = undefined;
     await user.save();
 
-    res.json({ message: "رمز عبور با موفقیت تغییر یافت" });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.json({ message: req.t("reset.reset_success") });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: req.t("reset.internal_error") });
   }
 };

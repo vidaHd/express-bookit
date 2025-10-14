@@ -1,44 +1,56 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { serviceService } from "../services/service.service";
 
-export const createService = async (req: any, res: Response) => {
+export const createService = async (req: Request, res: Response) => {
   try {
     const { title, jobId } = req.body;
 
-    const newService = await serviceService.createService({
-      title,
-      jobId,
-    });
+    if (!title || !jobId) {
+      return res.status(400).json({ error: req.t("service.not_found") });
+    }
 
+    const newService = await serviceService.createService({ title, jobId });
     await newService.save();
 
-    res.status(200).json({
+    res.status(201).json({
+      message: req.t("service.create_success"),
       ...newService.toObject(),
       _id: newService._id,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "خطای داخلی سرور" });
+    res.status(500).json({ error: req.t("service.internal_error") });
   }
 };
 
-export const AllService = async (req: any, res: Response) => {
+export const AllService = async (req: Request, res: Response) => {
   try {
     const { jobId } = req.params;
     const services = await serviceService.getAllServicesByJobId(jobId);
+
+    if (!services.length) {
+      return res.status(404).json({ error: req.t("service.not_found") });
+    }
+
     res.status(200).json(services);
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: req.t("service.internal_error") });
   }
 };
-export const ServiceById = async (req: any, res: Response) => {
+
+export const ServiceById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const services = await serviceService.getServicesByServiceId(id);
-    res.status(200).json(services);
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    const service = await serviceService.getServicesByServiceId(id);
+
+    if (!service || service.length === 0) {
+      return res.status(404).json({ error: req.t("service.not_found") });
+    }
+
+    res.status(200).json(service);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: req.t("service.internal_error") });
   }
 };
-
-

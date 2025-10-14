@@ -5,18 +5,19 @@ import profileRoutes from "./routes/profile.routes";
 import resetRoutes from "./routes/reset.routes";
 import companyRoutes from "./routes/company.routes";
 import serviceRoutes from "./routes/service.routes";
-import userService from "./routes/user-service.routes";
+import companyService from "./routes/company-service.routes";
 import jobRoutes from "./routes/job.routes";
 import availableTime from "./routes/available.time";
-
+import middleware from "i18next-http-middleware";
+import i18next from "./config/i18n";
 
 import { connectDB } from "./config/db";
 
 const app: Application = express();
-
-// Middleware
+ // Middleware
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
+app.use(middleware.handle(i18next));
 
 // MongoDB
 connectDB();
@@ -27,11 +28,8 @@ app.use("/", resetRoutes);
 app.use("/", companyRoutes);
 app.use("/", jobRoutes);
 app.use("/", serviceRoutes);
-app.use("/", userService);
+app.use("/", companyService);
 app.use("/", availableTime);
-
-
-
 
 const PORT = 5000;
 app.listen(PORT, () => {

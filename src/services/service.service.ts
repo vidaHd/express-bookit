@@ -27,7 +27,7 @@ export const serviceService = {
       query._id = { $in: filter.ids.map(id => new Types.ObjectId(id)) };
     }
 
-    return await Service.find(query).exec();
+    return await Service.find(query)
   },
 
   async getServiceById(id: string): Promise<IService | null> {
