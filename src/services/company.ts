@@ -3,7 +3,12 @@ import { CompanyService } from "../models/CompanyService";
 import { IUserService } from "../types/ICompanyService";
 
 export const companyService = {
-  async createCompany(data: { companyName: string; userId: string; jobId?: string }) {
+  async createCompany(data: {
+    companyName: string;
+    userId: string;
+    jobId?: string;
+    url: string;
+  }) {
     const newCompany = new Company(data);
     return await newCompany.save();
   },
@@ -16,7 +21,10 @@ export const companyService = {
     return await Company.find();
   },
 
-  async updateCompany(companyId: string, data: Partial<{ companyName: string; jobId: string }>) {
+  async updateCompany(
+    companyId: string,
+    data: Partial<{ companyName: string; url: string }>
+  ) {
     return await Company.findByIdAndUpdate(companyId, data, { new: true });
   },
 
@@ -24,8 +32,12 @@ export const companyService = {
     return await Company.findByIdAndDelete(companyId);
   },
 
-  // Services مرتبط با شرکت
-  async createService(data: { price: string; duration: string; serviceId: string; companyId: string }) {
+  async createService(data: {
+    price: string;
+    duration: string;
+    serviceId: string;
+    companyId: string;
+  }) {
     const newService = new CompanyService(data);
     return await newService.save();
   },
@@ -56,6 +68,13 @@ export const companyService = {
   },
 
   async deleteService(serviceId: string, companyId: string) {
-    return await CompanyService.findOneAndDelete({ serviceId, companyId }).exec();
+    return await CompanyService.findOneAndDelete({
+      serviceId,
+      companyId,
+    }).exec();
+  },
+
+  async getCompanyByUrl(url: string) {
+    return await Company.findOne({ url }).exec();
   },
 };
