@@ -74,7 +74,7 @@ export const companyService = {
     }).exec();
   },
 
-  async getCompanyByUrl(url: string) {
-    return await Company.findOne({ url }).exec();
-  },
+ async getCompanyByUrl(url: any) {
+  return await Company.findOne({ url }).exec();
+}
 };

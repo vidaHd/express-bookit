@@ -104,18 +104,19 @@ export const deleteCompany = async (req: Request, res: Response) => {
   }
 };
 
+
+
 export const getCompanyByUrl = async (req: Request, res: Response) => {
   try {
     const { url } = req.params;
-
+    console.log("Fetching company with URL:", url);
     const company = await companyService.getCompanyByUrl(url);
-    if (!company) {
+    if (!company)
       return res.status(404).json({ message: "Company not found" });
-    }
-
     res.status(200).json({ message: "Success", data: company });
   } catch (err) {
-    console.error(err);
+    console.error("Error in getCompanyByUrl:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+

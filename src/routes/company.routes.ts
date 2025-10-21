@@ -26,7 +26,7 @@ router.delete("/companies/:companyId", deleteCompany);
 /**
  * Get a specific company by url
  */
-router.get("/companies/:url", getCompanyByUrl);
+router.get("/companies/url/:url", getCompanyByUrl);
 
 
 export default router;
