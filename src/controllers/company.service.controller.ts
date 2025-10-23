@@ -36,12 +36,10 @@ export const getAllServicesByCompanyId = async (
     const userServices = await CompanyServices.getAllServicesByCompanyId(
       companyId
     );
-    console.log(userServices, "userServices");
 
     const services = await serviceService.getServices({
       ids: userServices.map((us: any) => us.serviceId),
     });
-    console.log(services, "services");
 
     const response = userServices.map((us: any) => ({
       price: us.price ?? "تماس بگیرید",

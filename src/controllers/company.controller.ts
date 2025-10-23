@@ -109,7 +109,6 @@ export const deleteCompany = async (req: Request, res: Response) => {
 export const getCompanyByUrl = async (req: Request, res: Response) => {
   try {
     const { url } = req.params;
-    console.log("Fetching company with URL:", url);
     const company = await companyService.getCompanyByUrl(url);
     if (!company)
       return res.status(404).json({ message: "Company not found" });

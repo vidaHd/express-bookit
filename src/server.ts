@@ -8,6 +8,8 @@ import serviceRoutes from "./routes/service.routes";
 import companyService from "./routes/company-service.routes";
 import jobRoutes from "./routes/job.routes";
 import availableTime from "./routes/available.time";
+import booking from "./routes/booking.routes";
+
 import middleware from "i18next-http-middleware";
 import i18next from "./config/i18n";
 
@@ -30,6 +32,8 @@ app.use("/", jobRoutes);
 app.use("/", serviceRoutes);
 app.use("/", companyService);
 app.use("/", availableTime);
+app.use("/", booking);
+
 
 const PORT = 5000;
 app.listen(PORT, () => {

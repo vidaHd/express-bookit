@@ -5,17 +5,19 @@ import { User } from "../models/User";
 const JWT_SECRET = "bookitSecretKey";
 
 export const AuthService = {
-  login: async (_id: string, mobileNumber: string, password: string) => {
-    const user = await User.findById(_id);
+  login: async (mobileNumber: string, password: string) => {
+    // پیدا کردن کاربر بر اساس موبایل
+    const user = await User.findOne({ mobileNumber });
     if (!user) throw new Error("wrong_user");
 
-    if (user.mobileNumber !== mobileNumber) throw new Error("wrong_mobile");
-
+    // بررسی پسورد
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new Error("wrong_password");
 
+    // حذف پسورد از آبجکت کاربر
     const { password: _, __v, ...userWithoutPass } = user.toObject();
 
+    // ساخت JWT
     const token = jwt.sign(
       { id: user._id, name: user.name, familyName: user.familyName },
       JWT_SECRET,
