@@ -4,11 +4,11 @@ import { IBooking } from "../types/IBooking";
 
 const BookingSchema = new Schema<IBooking>(
   {
-    companyServiceId: { type: String, required: true },
     userId: { type: String, required: true },
     selectedTimes: [{ type: String, required: true }],
     selectedDate: { type: String, required: true },
-    deletedAt: { type: String, default: null },
+    companyId :{ type: String, required: true },
+    serviceId: { type: String, required: true }
   },
   { timestamps: true }
 );

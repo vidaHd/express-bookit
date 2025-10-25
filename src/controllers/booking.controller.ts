@@ -4,16 +4,32 @@ import { bookingService } from "../services/booking.service";
 export const bookingController = {
   async create(req: Request, res: Response) {
     try {
-      const booking = await bookingService.createBooking(req.body);
-      res
-        .status(201)
-        .json({ message: "Booking created successfully", data: booking });
+      const { companyId, userId } = req.params;
+      const { serviceId, selectedDate, selectedTimes, } = req.body;
+    console.log("Incoming booking data:", req.params, req.body);
+
+      const bookingData = {
+        companyId,
+        userId,
+        serviceId,
+        selectedDate,
+        selectedTimes,
+      };
+
+      const booking = await bookingService.createBooking(bookingData);
+
+      res.status(201).json({
+        message: "Booking created successfully",
+        data: booking,
+      });
     } catch (error) {
       console.error("Error creating booking:", error);
-      res.status(400).json({ message: "Error creating booking", error });
+      res.status(400).json({
+        message: "Error creating booking",
+        error: error instanceof Error ? error.message : error,
+      });
     }
   },
-
   async getAll(req: Request, res: Response) {
     try {
       const { companyServiceId } = req.query;
@@ -51,7 +67,7 @@ export const bookingController = {
 
   async getReservedTimes(req: Request, res: Response) {
     try {
-      const { companyId, date } = req.query;
+      const { companyId, date } = req.params;
       if (!companyId || !date)
         return res
           .status(400)
@@ -70,13 +86,15 @@ export const bookingController = {
 
   async getUserBookings(req: Request, res: Response) {
     try {
-      const { userId } = req.query;
-      if (!userId)
-        return res
-          .status(400)
-          .json({ message: "userId and companyId are required" });
+      const { companyId, userId } = req.params;
+console.log(req.params, 'req');
 
-      const bookings = await bookingService.getUserBookings(userId as string);
+      const bookings = await bookingService.getUserBookings(
+        companyId as string,
+        userId as string
+      );
+      console.log(bookings,'bookings');
+      
       res.json({ bookings });
     } catch (error) {
       console.error(error);

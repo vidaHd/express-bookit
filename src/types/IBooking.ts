@@ -1,8 +1,7 @@
 export interface IBooking {
-  companyServiceId: string;
+  companyId: string;
   userId: string;
-  selectedTimes: { key: string };
-  selectedDate: { key: string };
-  createdAt: string;
-  deletedAt: string | null; 
+  selectedTimes: string;
+  selectedDate:  string ;
+  serviceId:string
 }

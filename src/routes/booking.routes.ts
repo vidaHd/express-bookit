@@ -4,9 +4,15 @@ import { bookingController } from "../controllers/booking.controller";
 const router = Router();
 
 /**
+ * Get bookings of the current user for a specific company
+ */
+router.get("/bookings/reserveTime/:companyId/:userId/", bookingController.getUserBookings);
+
+
+/**
  * Create a new booking
  */
-router.post("/bookings", bookingController.create);
+router.post("/bookings/:companyId/:userId", bookingController.create);
 
 /**
  * Get all bookings (with optional filters)
@@ -16,12 +22,8 @@ router.get("/bookings", bookingController.getAll);
 /**
  * Get reserved times for a company (for disabling)
  */
-router.get("/bookings/:companyServiceId", bookingController.getReservedTimes);
+router.get("/bookings/:companyId/:date", bookingController.getReservedTimes);
 
-/**
- * Get bookings of the current user for a specific company
- */
-router.get("/bookings/:userId/:companyServiceId", bookingController.getUserBookings);
 
 /**
  * Get a specific booking by ID

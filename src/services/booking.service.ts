@@ -6,7 +6,6 @@ export const bookingService = {
     const booking = new Booking(data);
     return await booking.save();
   },
-
   async getAllBookings(filters?: { companyServiceId?: string }) {
     const query: any = {};
     if (filters?.companyServiceId)
@@ -22,15 +21,15 @@ export const bookingService = {
     return await Booking.findByIdAndDelete(id);
   },
 
-  async getReservedTimesByCompany(companyId: string, date: string) {
-    const bookings = await Booking.find({
+ async getReservedTimesByCompany(companyId: string, date: string) {
+    return await Booking.find({
       companyId,
-      "selectedDate.key": date,
+      selectedDate: date,
     });
-    return bookings.map((b) => b.selectedTimes.key);
+    // return bookings.map((b) => b.selectedTimes);
   },
 
-  async getUserBookings(userId: string) {
-    return await Booking.find({ userId });
+  async getUserBookings(companyId: string, userId: string) {
+    return await Booking.find({ companyId, userId });
   },
 };
