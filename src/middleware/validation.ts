@@ -1,1 +1,0 @@
-// Simple validation file - keeping it minimal
