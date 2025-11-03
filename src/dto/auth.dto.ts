@@ -25,6 +25,9 @@ export class RegisterUserDto {
   @IsDefined()
   @IsString()
   password: string;
+
+  @IsDefined()
+  email?: string;
 }
 
 export class VerfifacationCodeDto {

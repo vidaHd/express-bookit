@@ -5,7 +5,9 @@
     "wrong_mobile": "شماره موبایل اشتباه است",
     "wrong_password": "رمز عبور اشتباه است",
     "login_success": "ورود موفقیت‌آمیز بود",
-    "signup_success": "کاربر با موفقیت ساخته شد"
+    "signup_success": "کاربر با موفقیت ساخته شد",
+    "verification_code_subject": "کد تأیید شما ",
+    "verification_code_email": "سلام {{name}} عزیز، کد تأیید شما: {{code}}"
   },
   "time": {
     "missing_fields": "companyId و timesByDay الزامی هستند",
@@ -47,5 +49,16 @@
   },
   "errors": {
     "internal": "خطای داخلی سرور"
+  },
+  "email": {
+    "new_booking_subject": "رزرو جدید دریافت شد ✅",
+    "new_booking_body": "سلام {{companyName}}،\nشما یک رزرو جدید دارید برای تاریخ {{selectedDate}} در ساعت {{selectedTimes}}.\n\nبا احترام،\nتیم Bookit"
+  },
+   "booking": {
+    "created_success": "رزرو با موفقیت ایجاد شد ✅",
+    "fetched_success": "رزروها با موفقیت دریافت شدند ✅",
+    "deleted_success": "رزرو با موفقیت حذف شد ✅",
+    "reserved_times_fetched": "ساعت‌های رزرو شده با موفقیت دریافت شد ✅",
+    "user_bookings_fetched": "رزروهای کاربر با موفقیت دریافت شدند ✅"
   }
 }

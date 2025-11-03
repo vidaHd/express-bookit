@@ -5,7 +5,6 @@ export const successResponse = (res: Response, message: string, data: object = {
 };
 
 export const errorResponse = (req: Request, res: Response, err: any, status = 400) => {
-  console.error(err);
   const errorMsg = err?.message ? req.t(`errors.${err.message}`) : req.t("errors.internal");
   res.status(status).json({ error: errorMsg });
 };

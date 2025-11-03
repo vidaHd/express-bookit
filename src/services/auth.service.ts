@@ -7,7 +7,6 @@ const JWT_SECRET = "bookitSecretKey";
 export const AuthService = {
   login: async (mobileNumber: string, password: string) => {
     const user = await User.findOne({ mobileNumber });
-    console.log(mobileNumber);
     
     if (!user) throw new Error("wrong_user");
 
@@ -30,6 +29,7 @@ export const AuthService = {
     familyName: string;
     mobileNumber: string;
     password: string;
+    email: string;
   }) => {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 

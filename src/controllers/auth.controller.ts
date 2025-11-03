@@ -3,6 +3,7 @@ import { AuthService } from "../services/auth.service";
 import { successResponse, asyncHandler } from "../helpers/response.helper";
 import { sendSMS } from "../helpers/sms.helper";
 import { User } from "../models/User";
+import { sendEmail } from "../helpers/email.helper";
 
 //login user
 export const login = asyncHandler(async (req: Request, res: Response) => {
@@ -15,13 +16,14 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
 //register user
 export const signup = asyncHandler(async (req: Request, res: Response) => {
-  const { name, familyName, mobileNumber, password } = req.body;
+  const { name, familyName, mobileNumber, password, email } = req.body;
 
   const user = await AuthService.signup({
     name,
     familyName,
     mobileNumber,
     password,
+    email,
   });
 
   const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -33,6 +35,13 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
   //   `سلام ${name} عزیز کد ورود به سایت: ${code}`
   // );
 
+  if (email) {
+    await sendEmail(
+      email,
+      req.t("auth.verification_code_subject"),
+      req.t("auth.verification_code_email", { name, code })
+    );
+  }
   successResponse(res, req.t("auth.signup_success"), { user });
 });
 

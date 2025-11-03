@@ -3,6 +3,7 @@ export interface IUser extends Document {
   password: string;
   familyName: string;
   mobileNumber: string;
+  email: string;
   profile?: {
     age?: number;
     avatar?: string;

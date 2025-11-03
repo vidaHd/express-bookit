@@ -2,9 +2,7 @@ import { Request, Response } from "express";
 import { bookingService } from "../services/booking.service";
 import { asyncHandler, successResponse } from "../helpers/response.helper";
 import { Types } from "mongoose";
-import { sendSMS } from "../helpers/sms.helper";
 import { companyService } from "../services/company.service";
-import nodemailer from "nodemailer";
 import { sendEmail } from "../helpers/email.helper";
 
 export const bookingController = {
@@ -19,15 +17,21 @@ export const bookingController = {
       selectedDate,
       selectedTimes,
     });
+
     const company = await companyService.getCompanyById(companyId);
     if (company?.email) {
       await sendEmail(
         company.email,
-        "رزرو جدید دریافت شد ✅",
-        `سلام ${company.companyName}،\nشما یک رزرو جدید دارید برای تاریخ ${selectedDate} در ساعت ${selectedTimes}`
+        req.t("email.new_booking_subject"), 
+        req.t("email.new_booking_body", {
+          companyName: company.companyName,
+          selectedDate,
+          selectedTimes,
+        })
       );
     }
-    successResponse(res, "Booking created successfully", { data: booking });
+
+    successResponse(res, req.t("booking.created_success"), { data: booking });
   }),
 
   getAll: asyncHandler(async (req: Request, res: Response) => {
@@ -35,19 +39,22 @@ export const bookingController = {
     const bookings = await bookingService.getAllBookings({
       companyId: new Types.ObjectId(companyId),
     });
-    successResponse(res, "Bookings fetched successfully", { data: bookings });
-  }),
 
+    successResponse(res, req.t("booking.fetched_success"), { data: bookings });
+  }),
+  
   getOne: asyncHandler(async (req: Request, res: Response) => {
     const { bookingId } = req.params;
     const booking = await bookingService.getBookingById(bookingId);
-    successResponse(res, "Booking fetched successfully", { data: booking });
+
+    successResponse(res, req.t("booking.fetched_success"), { data: booking });
   }),
 
   remove: asyncHandler(async (req: Request, res: Response) => {
     const { bookingId } = req.params;
     await bookingService.deleteBooking(bookingId);
-    successResponse(res, "Booking deleted successfully");
+
+    successResponse(res, req.t("booking.deleted_success"));
   }),
 
   getReservedTimes: asyncHandler(async (req: Request, res: Response) => {
@@ -58,7 +65,7 @@ export const bookingController = {
       date
     );
 
-    successResponse(res, "Reserved times fetched successfully", {
+    successResponse(res, req.t("booking.reserved_times_fetched"), {
       data: reservedTimes,
     });
   }),
@@ -71,7 +78,7 @@ export const bookingController = {
       new Types.ObjectId(userId)
     );
 
-    successResponse(res, "User bookings fetched successfully", {
+    successResponse(res, req.t("booking.user_bookings_fetched"), {
       data: bookings,
     });
   }),

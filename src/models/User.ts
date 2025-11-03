@@ -6,6 +6,7 @@ const UserSchema: Schema<IUser> = new Schema({
   familyName: { type: String, require: true },
   mobileNumber: { type: String, require: true },
   password: { type: String, required: true },
+  email: { type: String,required: true },
   profile: { age: Number, avatar: String, gender: String, description: String },
   resetCode: { type: String },
   newPasswordTemp: { type: String },
