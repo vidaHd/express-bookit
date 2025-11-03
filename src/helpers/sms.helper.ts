@@ -1,4 +1,3 @@
-// src/helpers/sms.helper.ts
 import Kavenegar from "kavenegar";
 
 const api = Kavenegar.KavenegarApi({

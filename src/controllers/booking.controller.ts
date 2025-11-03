@@ -4,6 +4,8 @@ import { asyncHandler, successResponse } from "../helpers/response.helper";
 import { Types } from "mongoose";
 import { sendSMS } from "../helpers/sms.helper";
 import { companyService } from "../services/company.service";
+import nodemailer from "nodemailer";
+import { sendEmail } from "../helpers/email.helper";
 
 export const bookingController = {
   create: asyncHandler(async (req: Request, res: Response) => {
@@ -18,11 +20,11 @@ export const bookingController = {
       selectedTimes,
     });
     const company = await companyService.getCompanyById(companyId);
-    if (company) {
-      const mobileNumber = company.mobileNumber;
-      await sendSMS(
-        mobileNumber,
-        `سلام شما یک رزو جدید برای ساعت ${selectedTimes} در تاریخ ${selectedDate} دارید.`
+    if (company?.email) {
+      await sendEmail(
+        company.email,
+        "رزرو جدید دریافت شد ✅",
+        `سلام ${company.companyName}،\nشما یک رزرو جدید دارید برای تاریخ ${selectedDate} در ساعت ${selectedTimes}`
       );
     }
     successResponse(res, "Booking created successfully", { data: booking });
