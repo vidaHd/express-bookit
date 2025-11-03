@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { companyService } from "../services/company";
+import { companyService } from "../services/company.service";
+import { asyncHandler, successResponse } from "../helpers/response.helper";
 
 function generateRandomUrl(length = 8) {
   const chars =
@@ -11,14 +12,11 @@ function generateRandomUrl(length = 8) {
   return result;
 }
 
-export const addCompany = async (req: any, res: Response) => {
-  try {
+export const companyController = {
+  addCompany: asyncHandler(async (req: any, res: Response) => {
     const { companyName, jobId } = req.body;
     const userId = req.user?.id;
 
-    if (!companyName) {
-      return res.status(400).json({ message: req.t("company.name_required") });
-    }
     const url = `${companyName
       .toLowerCase()
       .replace(/\s+/g, "-")}-${generateRandomUrl(4)}`;
@@ -29,93 +27,50 @@ export const addCompany = async (req: any, res: Response) => {
       userId,
       url,
     });
-
     await newCompany.save();
-    res.status(200).json({
-      ...newCompany.toObject(),
-      _id: newCompany._id,
+
+    successResponse(res, "Company created successfully", {
+      data: newCompany.toObject(),
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("company.internal_error") });
-  }
-};
+  }),
 
-export const getAllCompanies = async (_req: Request, res: Response) => {
-  try {
+  getAllCompanies: asyncHandler(async (_req: Request, res: Response) => {
     const companies = await companyService.getAllCompanies();
-    res.status(200).json(companies);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: _req.t("company.internal_error") });
-  }
-};
+    successResponse(res, "Companies fetched successfully", { data: companies });
+  }),
 
-export const getCompanyById = async (req: Request, res: Response) => {
-  try {
+  getCompanyById: asyncHandler(async (req: Request, res: Response) => {
     const { companyId } = req.params;
     const company = await companyService.getCompanyById(companyId);
+    successResponse(res, "Company fetched successfully", { data: company });
+  }),
 
-    if (!company) {
-      return res.status(404).json({ message: req.t("company.not_found") });
-    }
-
-    res.status(200).json({ message: req.t("company.success"), data: company });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("company.internal_error") });
-  }
-};
-
-export const updateCompany = async (req: Request, res: Response) => {
-  try {
+  updateCompany: asyncHandler(async (req: Request, res: Response) => {
     const { companyId } = req.params;
-    const { companyName, url } = req.body;
+    const { companyName, url, mobileNumber, address, email, description } =
+      req.body;
 
     const updated = await companyService.updateCompany(companyId, {
       companyName,
       url,
+      mobileNumber,
+      address,
+      email,
+      description,
     });
 
-    if (!updated)
-      return res.status(404).json({ message: req.t("company.not_found") });
+    successResponse(res, "Company updated successfully", { data: updated });
+  }),
 
-    res
-      .status(200)
-      .json({ message: req.t("company.updated_success"), data: updated });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("company.internal_error") });
-  }
-};
-
-export const deleteCompany = async (req: Request, res: Response) => {
-  try {
+  deleteCompany: asyncHandler(async (req: Request, res: Response) => {
     const { companyId } = req.params;
     const deleted = await companyService.deleteCompany(companyId);
+    successResponse(res, "Company deleted successfully");
+  }),
 
-    if (!deleted)
-      return res.status(404).json({ message: req.t("company.not_found") });
-
-    res.status(200).json({ message: req.t("company.deleted_success") });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("company.internal_error") });
-  }
-};
-
-
-
-export const getCompanyByUrl = async (req: Request, res: Response) => {
-  try {
+  getCompanyByUrl: asyncHandler(async (req: Request, res: Response) => {
     const { url } = req.params;
     const company = await companyService.getCompanyByUrl(url);
-    if (!company)
-      return res.status(404).json({ message: "Company not found" });
-    res.status(200).json({ message: "Success", data: company });
-  } catch (err) {
-    console.error("Error in getCompanyByUrl:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
+    successResponse(res, "Company fetched successfully", { data: company });
+  }),
 };
-

@@ -12,11 +12,13 @@ export const serviceService = {
     return await Service.find({ jobId });
   },
 
-   async getServicesByServiceId(id: string) {
+  async getServicesByServiceId(id: string) {
     return await Service.find({ id });
   },
 
-  async getServices(filter: { jobId?: string; ids?: string[] } = {}): Promise<IService[]> {
+  async getServices(
+    filter: { jobId?: string; ids?: string[] } = {}
+  ): Promise<IService[]> {
     const query: any = {};
 
     if (filter.jobId) {
@@ -24,10 +26,10 @@ export const serviceService = {
     }
 
     if (filter.ids && Array.isArray(filter.ids) && filter.ids.length > 0) {
-      query._id = { $in: filter.ids.map(id => new Types.ObjectId(id)) };
+      query._id = { $in: filter.ids.map((id) => new Types.ObjectId(id)) };
     }
 
-    return await Service.find(query)
+    return await Service.find(query);
   },
 
   async getServiceById(id: string): Promise<IService | null> {
@@ -35,7 +37,10 @@ export const serviceService = {
   },
 
   // Update a service by ID
-  async updateService(id: string, data: Partial<{ title: string; jobId: string }>): Promise<IService | null> {
+  async updateService(
+    id: string,
+    data: Partial<{ title: string; jobId: string }>
+  ): Promise<IService | null> {
     return await Service.findByIdAndUpdate(id, data, { new: true }).exec();
   },
 

@@ -1,17 +1,11 @@
 import { Request, Response } from "express";
 import { serviceService } from "../services/service.service";
-import { CompanyServices } from "../services/company.service";
-import { companyService } from "../services/company";
+import { CompanyServices } from "../services/companyService.service";
+import { asyncHandler, successResponse } from "../helpers/response.helper";
 
-export const createUserService = async (req: Request, res: Response) => {
-  try {
+export const serviceController = {
+  createUserService: asyncHandler(async (req: Request, res: Response) => {
     const { companyId, serviceId, price, duration } = req.body;
-
-    if (!companyId || !serviceId || !price || !duration) {
-      return res
-        .status(400)
-        .json({ message: req.t("service.fields_required") });
-    }
 
     const newService = await CompanyServices.createService({
       price,
@@ -20,74 +14,53 @@ export const createUserService = async (req: Request, res: Response) => {
       companyId,
     });
 
-    res.status(201).json(newService);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("errors.internal") });
-  }
-};
+    successResponse(res, "Service created successfully", { data: newService });
+  }),
 
-export const getAllServicesByCompanyId = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+  getAllServicesByCompanyId: asyncHandler(
+    async (req: Request, res: Response) => {
+      const { companyId } = req.params;
+
+      const userServices = await CompanyServices.getAllServicesByCompanyId(
+        companyId
+      );
+      const services = await serviceService.getServices({
+        ids: userServices.map((us: any) => us.serviceId),
+      });
+
+      const response = userServices.map((us: any) => ({
+        price: us.price ?? "Contact us",
+        duration: us.duration ?? "Contact us",
+        serviceId: us.serviceId,
+        concurrentCapability: us.concurrentCapability,
+        companyId: us.companyId,
+        title: services.find((s) => s._id.toString() === us.serviceId)?.title,
+      }));
+
+      successResponse(res, "Services fetched successfully", { data: response });
+    }
+  ),
+
+  updateService: asyncHandler(async (req: Request, res: Response) => {
     const { companyId } = req.params;
-    const userServices = await CompanyServices.getAllServicesByCompanyId(
-      companyId
-    );
-
-    const services = await serviceService.getServices({
-      ids: userServices.map((us: any) => us.serviceId),
-    });
-
-    const response = userServices.map((us: any) => ({
-      price: us.price ?? "تماس بگیرید",
-      duration: us.duration ?? "تماس بگیرید",
-      serviceId: us.serviceId,
-      companyId: us.companyId,
-      title: services.find((s) => s._id.toString() === us.serviceId)?.title,
-    }));
-    res.status(200).json(response);
-  } catch (err) {
-    res.status(500).json({ error: "خطای داخلی سرور" });
-  }
-};
-
-export const updateService = async (req: Request, res: Response) => {
-  try {
-    const { companyId } = req.params;
-    const { serviceId, price, duration } = req.body;
+    const { serviceId, price, duration, concurrentCapability } = req.body;
 
     if (!companyId || !serviceId) {
-      return res
-        .status(400)
-        .json({ message: req.t("service.fields_required") });
+      throw new Error("companyId and serviceId are required");
     }
 
     const updated = await CompanyServices.updateService(
       serviceId,
       companyId,
       price,
-      duration
+      duration,
+      concurrentCapability
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: req.t("service.not_found") });
-    }
+    successResponse(res, "Service updated successfully", { data: updated });
+  }),
 
-    res.status(200).json({
-      message: req.t("service.updated_success"),
-      data: updated,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("errors.internal") });
-  }
-};
-
-export const updateUserServicesBulk = async (req: Request, res: Response) => {
-  try {
+  updateUserServicesBulk: asyncHandler(async (req: Request, res: Response) => {
     const { companyId } = req.params;
     const { serviceIds } = req.body;
 
@@ -96,34 +69,15 @@ export const updateUserServicesBulk = async (req: Request, res: Response) => {
       serviceIds
     );
 
-    res.status(200).json({
-      message: req.t("service.bulk_updated_success"),
+    successResponse(res, "Services updated successfully", {
       data: updatedServices,
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("errors.internal") });
-  }
-};
+  }),
 
-export const deleteUserService = async (req: Request, res: Response) => {
-  try {
+  deleteUserService: asyncHandler(async (req: Request, res: Response) => {
     const { serviceId, companyId } = req.params;
+    await CompanyServices.deleteService(serviceId, companyId);
 
-    if (!serviceId || !companyId) {
-      return res
-        .status(400)
-        .json({ message: req.t("service.fields_required") });
-    }
-
-    const deleted = await CompanyServices.deleteService(serviceId, companyId);
-
-    if (!deleted)
-      return res.status(404).json({ message: req.t("service.not_found") });
-
-    res.status(200).json({ message: req.t("service.deleted_success") });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("errors.internal") });
-  }
+    successResponse(res, "Service deleted successfully");
+  }),
 };

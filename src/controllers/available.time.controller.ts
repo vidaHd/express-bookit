@@ -1,70 +1,42 @@
 import { Request, Response } from "express";
 import { timeService } from "../services/time.service";
+import { successResponse, asyncHandler } from "../helpers/response.helper";
 
-export const addOrUpdateAvailableTimes = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const addOrUpdateAvailableTimes = asyncHandler(
+  async (req: Request, res: Response) => {
     const { companyId, timesByDay } = req.body;
-    if (!companyId || !timesByDay || typeof timesByDay !== "object") {
-      return res
-        .status(400)
-        .json({ message: req.t("errors.companyId_timesByDay_required") });
-    }
 
     const result = await timeService.addOrUpdateAvailableTimesBulk(
       companyId,
       timesByDay
     );
 
-    res.status(200).json({
-      message: req.t("time.update_success"),
-      data: result,
-    });
-  } catch (err) {
-    console.error("Error in addOrUpdateAvailableTimes:", err);
-    res.status(500).json({ message: req.t("errors.internal") });
+    successResponse(res, req.t("time.update_success"), { data: result });
   }
-};
+);
 
-export const getTimeByCompanyAndDay = async (req: Request, res: Response) => {
-  try {
+export const getTimeByCompanyAndDay = asyncHandler(
+  async (req: Request, res: Response) => {
     const { companyId, day } = req.params;
+
     const time = await timeService.getByCompanyAndDay(companyId, day);
 
-    if (!time)
-      return res.status(404).json({ message: req.t("time.not_found_for_day") });
-
-    res.status(200).json({ message: req.t("time.success"), data: time });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("errors.internal") });
+    successResponse(res, req.t("time.success"), { data: time });
   }
-};
+);
 
-export const getAllTimesByCompany = async (req: Request, res: Response) => {
-  try {
+export const getAllTimesByCompany = asyncHandler(
+  async (req: Request, res: Response) => {
     const { companyId } = req.params;
-    if (!companyId)
-      return res
-        .status(400)
-        .json({ message: req.t("errors.companyId_required") });
 
     const timesByDay = await timeService.getAllByCompany(companyId);
-    res.status(200).json(timesByDay);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: req.t("errors.internal") });
+    successResponse(res, req.t("time.success"), { data: timesByDay });
   }
-};
+);
 
-export const getAllTimes = async (_req: Request, res: Response) => {
-  try {
+export const getAllTimes = asyncHandler(
+  async (_req: Request, res: Response) => {
     const times = await timeService.getAll();
-    res.status(200).json({ message: _req.t("time.success"), data: times });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: _req.t("errors.internal") });
+    successResponse(res, _req.t("time.success"), { data: times });
   }
-};
+);

@@ -1,7 +1,10 @@
+import { Types } from "mongoose";
+
 export interface IBooking {
-  companyId: string;
-  userId: string;
-  selectedTimes: string;
-  selectedDate:  string ;
-  serviceId:string
+  companyId: Types.ObjectId;
+  userId: Types.ObjectId;
+  serviceId: Types.ObjectId;
+  selectedDate: string;
+  selectedTimes: string[];
+  status?: "pending" | "confirmed" | "rejected";
 }

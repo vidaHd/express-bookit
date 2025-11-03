@@ -1,43 +1,55 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
+import { successResponse, asyncHandler } from "../helpers/response.helper";
+import { sendSMS } from "../helpers/sms.helper";
+import { User } from "../models/User";
 
-export const login = async (req: Request, res: Response) => {
-  try {
-    const { mobileNumber, password } = req.body;
+//login user
+export const login = asyncHandler(async (req: Request, res: Response) => {
+  const { mobileNumber, password } = req.body;
 
-    const { user, token } = await AuthService.login(mobileNumber, password);
+  const { user, token } = await AuthService.login(mobileNumber, password);
 
-    res.status(200).json({
-      message: req.t("auth.login_success"),
-      user,
-      token,
-    });
-  } catch (err: any) {
-    console.error(err);
-    const errorMsg = err.message
-      ? req.t(`auth.${err.message}`)
-      : req.t("errors.internal");
-    res.status(400).json({ error: errorMsg });
+  successResponse(res, req.t("auth.login_success"), { user, token });
+});
+
+//register user
+export const signup = asyncHandler(async (req: Request, res: Response) => {
+  const { name, familyName, mobileNumber, password } = req.body;
+
+  const user = await AuthService.signup({
+    name,
+    familyName,
+    mobileNumber,
+    password,
+  });
+
+  const code = Math.floor(1000 + Math.random() * 9000).toString();
+  user.verificationCode = code;
+  await user.save();
+
+  // await sendSMS(
+  //   mobileNumber,
+  //   `سلام ${name} عزیز کد ورود به سایت: ${code}`
+  // );
+
+  successResponse(res, req.t("auth.signup_success"), { user });
+});
+
+//verify code
+export const vrifactionCode = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { code, id } = req.body;
+    const user = await User.findOne({ _id: id });
+    if (!user) throw new Error("User not found");
+
+    if (user.verificationCode !== code)
+      throw new Error("Reset code is invalid");
+
+    user.isVerified = true;
+    user.verificationCode = undefined;
+    await user.save();
+
+    successResponse(res, "User verified successfully");
   }
-};
-
-export const signup = async (req: Request, res: Response) => {
-  try {
-    const { name, familyName, mobileNumber, password } = req.body;
-
-    const user = await AuthService.signup({
-      name,
-      familyName,
-      mobileNumber,
-      password,
-    });
-
-    res.status(201).json({
-      message: req.t("auth.signup_success"),
-      user,
-    });
-  } catch (err: any) {
-    console.error(err);
-    res.status(400).json({ error: req.t("errors.internal") });
-  }
-};
+);

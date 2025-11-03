@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 import { Job } from "../models/Job";
+import { asyncHandler, successResponse, errorResponse } from "../helpers/response.helper";
 
-export const getJobs = async (_req: Request, res: Response) => {
-  try {
+export const jobController = {
+  getJobs: asyncHandler(async (req: Request, res: Response) => {
     const jobList = await Job.find();
-    res.status(200).json(jobList);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: _req.t("job.internal_error") });
-  }
+    successResponse(res, "Jobs fetched successfully", { data: jobList });
+  }),
 };

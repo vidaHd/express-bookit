@@ -1,14 +1,5 @@
+import { WEEK_DAY_KEYS } from "../constant";
 import { Time } from "../models/Time";
-
-const WEEK_DAY_KEYS = [
-  "saturday",
-  "sunday",
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-];
 
 export const timeService = {
   async addOrUpdateAvailableTimesBulk(
@@ -18,7 +9,9 @@ export const timeService = {
     if (!companyId || typeof timesByDay !== "object") return null;
 
     const ops = Object.entries(timesByDay)
-      .filter(([day, times]) => WEEK_DAY_KEYS.includes(day) && Array.isArray(times))
+      .filter(
+        ([day, times]) => WEEK_DAY_KEYS.includes(day) && Array.isArray(times)
+      )
       .map(([day, times]) => ({
         updateOne: {
           filter: { companyId, day },

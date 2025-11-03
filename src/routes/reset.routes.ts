@@ -1,16 +1,25 @@
 import { Router } from "express";
-import { requestResetPassword, checkResetPassword } from "../controllers/reset.controller";
+import { resetPasswordController } from "../controllers/reset.controller";
+import { validationMiddleware } from "../middleware";
+import { RequestResetPasswordDto } from "../dto/reset-password.dto";
 
 const router = Router();
 
 /**
  * Request a password reset (sends reset code/email)
  */
-router.post("/request-reset-password", requestResetPassword);
+router.post(
+  "/request-reset-password",
+  validationMiddleware(RequestResetPasswordDto),
+  resetPasswordController.requestResetPassword
+);
 
 /**
  * Verify reset code and allow password change
  */
-router.post("/check-reset-password", checkResetPassword);
+router.post(
+  "/check-reset-password",
+  resetPasswordController.checkResetPassword
+);
 
 export default router;

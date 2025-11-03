@@ -1,7 +1,44 @@
+import { Company } from "../models/Company";
 import { CompanyService } from "../models/CompanyService";
-import { IUserService } from "../types/ICompanyService";
 
-export const CompanyServices = {
+export const companyService = {
+  async createCompany(data: {
+    companyName: string;
+    userId: string;
+    jobId?: string;
+    url: string;
+  }) {
+    const newCompany = new Company(data);
+    return await newCompany.save();
+  },
+
+  async getCompanyById(companyId: string) {
+    return await Company.findById(companyId);
+  },
+
+  async getAllCompanies() {
+    return await Company.find();
+  },
+
+  async updateCompany(
+    companyId: string,
+    data: Partial<{
+      companyName: string;
+      url: string;
+      mobileNumber: string;
+      address: string;
+      email: string;
+      description: string;
+    }>
+  ) {
+    
+    return await Company.findByIdAndUpdate(companyId, data, { new: true });
+  },
+
+  async deleteCompany(companyId: string) {
+    return await Company.findByIdAndDelete(companyId);
+  },
+
   async createService(data: {
     price: string;
     duration: string;
@@ -13,7 +50,7 @@ export const CompanyServices = {
   },
 
   async getAllServicesByCompanyId(companyId: string) {
-    return await CompanyService.find({ companyId })
+    return await CompanyService.find({ companyId }).exec();
   },
 
   async getServiceByCompanyAndId(serviceId: string, companyId: string) {
@@ -26,33 +63,15 @@ export const CompanyServices = {
     price?: string,
     duration?: string
   ) {
+    const updateData: any = {};
+    if (price !== undefined) updateData.price = price;
+    if (duration !== undefined) updateData.duration = duration;
+
     return await CompanyService.findOneAndUpdate(
       { serviceId, companyId },
-      { price, duration },
+      updateData,
       { new: true }
     ).exec();
-  },
-
-  async updateServicesBulk(
-    companyId: string,
-    serviceIds: string[],
-  ) {
-    const results = await Promise.all(
-      serviceIds.map(async (serviceId) => {
-        const existing = await CompanyService.findOne({ serviceId, companyId });
-        if (existing) {
-          Object.assign(existing);
-          return await existing.save();
-        } else {
-          const newService = new CompanyService({
-            serviceId,
-            companyId,
-          });
-          return await newService.save();
-        }
-      })
-    );
-    return results;
   },
 
   async deleteService(serviceId: string, companyId: string) {
@@ -60,5 +79,9 @@ export const CompanyServices = {
       serviceId,
       companyId,
     }).exec();
+  },
+
+  async getCompanyByUrl(url: any) {
+    return await Company.findOne({ url }).exec();
   },
 };

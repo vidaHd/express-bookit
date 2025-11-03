@@ -9,6 +9,8 @@ const UserSchema: Schema<IUser> = new Schema({
   profile: { age: Number, avatar: String, gender: String, description: String },
   resetCode: { type: String },
   newPasswordTemp: { type: String },
+  verificationCode: { type: String },
+  isVerified: { type: Boolean, default: false },
 });
 
 export const User = mongoose.model<IUser>("User", UserSchema);

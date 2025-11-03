@@ -1,4 +1,3 @@
-
 export interface IUser extends Document {
   name: string;
   password: string;
@@ -12,4 +11,6 @@ export interface IUser extends Document {
   };
   resetCode?: string;
   newPasswordTemp?: string;
+  verificationCode?: string;
+  isVerified?: boolean;
 }

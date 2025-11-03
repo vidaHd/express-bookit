@@ -1,4 +1,5 @@
-import { Booking } from "../models/IBooking";
+import { Types } from "mongoose";
+import { Booking } from "../models/Booking";
 import { IBooking } from "../types/IBooking";
 
 export const bookingService = {
@@ -6,30 +7,36 @@ export const bookingService = {
     const booking = new Booking(data);
     return await booking.save();
   },
-  async getAllBookings(filters?: { companyServiceId?: string }) {
-    const query: any = {};
-    if (filters?.companyServiceId)
-      query.companyServiceId = filters.companyServiceId;
-    return await Booking.find(query);
+
+  async getAllBookings(filters?: { companyId?: Types.ObjectId }) {
+    const query: Record<string, any> = {};
+    if (filters?.companyId) query.companyId = filters.companyId;
+
+    return await Booking.find(query)
+      .populate("userId", "name mobileNumber")
+      .populate("serviceId", "title price duration");
   },
 
   async getBookingById(id: string) {
-    return await Booking.findById(id);
+    return await Booking.findById(id)
+      .populate("userId", "name mobileNumber")
+      .populate("serviceId", "title price duration");
   },
 
   async deleteBooking(id: string) {
     return await Booking.findByIdAndDelete(id);
   },
 
- async getReservedTimesByCompany(companyId: string, date: string) {
+  async getReservedTimesByCompany(companyId: Types.ObjectId, date: string) {
     return await Booking.find({
       companyId,
       selectedDate: date,
     });
-    // return bookings.map((b) => b.selectedTimes);
   },
 
-  async getUserBookings(companyId: string, userId: string) {
-    return await Booking.find({ companyId, userId });
+  async getUserBookings(companyId: Types.ObjectId, userId: Types.ObjectId) {
+    return await Booking.find({ companyId, userId })
+      .populate("serviceId", "title price duration")
+      .populate("companyId", "name");
   },
 };

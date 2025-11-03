@@ -5,6 +5,8 @@ import {
   getTimeByCompanyAndDay,
   getAllTimes,
 } from "../controllers/available.time.controller";
+import { validationMiddleware } from "../middleware";
+import { AddOrUpdateAvailableTimesDto } from "../dto/time.dto";
 
 const router = Router();
 
@@ -21,7 +23,11 @@ router.get("/companies/:companyId/times/:day", getTimeByCompanyAndDay);
 /**
  * Add or update multiple available times for a company
  */
-router.post("/companies/:companyId/times/bulk", addOrUpdateAvailableTimes);
+router.post(
+  "/companies/:companyId/times/bulk",
+  validationMiddleware(AddOrUpdateAvailableTimesDto),
+  addOrUpdateAvailableTimes
+);
 
 /**
  * Get all available times from all companies

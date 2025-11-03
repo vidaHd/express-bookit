@@ -3,4 +3,5 @@ export interface IUserService extends Document {
   duration?: string;
   serviceId: string;
   companyId: string;
+  concurrentCapability?: boolean;
 }

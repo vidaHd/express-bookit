@@ -1,104 +1,76 @@
 import { Request, Response } from "express";
 import { bookingService } from "../services/booking.service";
+import { asyncHandler, successResponse } from "../helpers/response.helper";
+import { Types } from "mongoose";
+import { sendSMS } from "../helpers/sms.helper";
+import { companyService } from "../services/company.service";
 
 export const bookingController = {
-  async create(req: Request, res: Response) {
-    try {
-      const { companyId, userId } = req.params;
-      const { serviceId, selectedDate, selectedTimes, } = req.body;
-    console.log("Incoming booking data:", req.params, req.body);
+  create: asyncHandler(async (req: Request, res: Response) => {
+    const { companyId, userId } = req.params;
+    const { serviceId, selectedDate, selectedTimes } = req.body;
 
-      const bookingData = {
-        companyId,
-        userId,
-        serviceId,
-        selectedDate,
-        selectedTimes,
-      };
-
-      const booking = await bookingService.createBooking(bookingData);
-
-      res.status(201).json({
-        message: "Booking created successfully",
-        data: booking,
-      });
-    } catch (error) {
-      console.error("Error creating booking:", error);
-      res.status(400).json({
-        message: "Error creating booking",
-        error: error instanceof Error ? error.message : error,
-      });
-    }
-  },
-  async getAll(req: Request, res: Response) {
-    try {
-      const { companyServiceId } = req.query;
-      const bookings = await bookingService.getAllBookings({
-        companyServiceId: companyServiceId as string,
-      });
-      res.json({ data: bookings });
-    } catch (error) {
-      console.error("Error fetching bookings:", error);
-      res.status(500).json({ message: "Error fetching bookings" });
-    }
-  },
-
-  async getOne(req: Request, res: Response) {
-    try {
-      const booking = await bookingService.getBookingById(req.params.bookingId);
-      if (!booking)
-        return res.status(404).json({ message: "Booking not found" });
-      res.json({ data: booking });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching booking", error });
-    }
-  },
-
-  async remove(req: Request, res: Response) {
-    try {
-      const deleted = await bookingService.deleteBooking(req.params.bookingId);
-      if (!deleted)
-        return res.status(404).json({ message: "Booking not found" });
-      res.json({ message: "Booking deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error deleting booking", error });
-    }
-  },
-
-  async getReservedTimes(req: Request, res: Response) {
-    try {
-      const { companyId, date } = req.params;
-      if (!companyId || !date)
-        return res
-          .status(400)
-          .json({ message: "companyId and date are required" });
-
-      const reservedTimes = await bookingService.getReservedTimesByCompany(
-        companyId as string,
-        date as string
+    const booking = await bookingService.createBooking({
+      companyId: new Types.ObjectId(companyId),
+      userId: new Types.ObjectId(userId),
+      serviceId: new Types.ObjectId(serviceId),
+      selectedDate,
+      selectedTimes,
+    });
+    const company = await companyService.getCompanyById(companyId);
+    if (company) {
+      const mobileNumber = company.mobileNumber;
+      await sendSMS(
+        mobileNumber,
+        `سلام شما یک رزو جدید برای ساعت ${selectedTimes} در تاریخ ${selectedDate} دارید.`
       );
-      res.json({ data: reservedTimes });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error fetching reserved times" });
     }
-  },
+    successResponse(res, "Booking created successfully", { data: booking });
+  }),
 
-  async getUserBookings(req: Request, res: Response) {
-    try {
-      const { companyId, userId } = req.params;
-console.log(req.params, 'req');
+  getAll: asyncHandler(async (req: Request, res: Response) => {
+    const { companyId } = req.params;
+    const bookings = await bookingService.getAllBookings({
+      companyId: new Types.ObjectId(companyId),
+    });
+    successResponse(res, "Bookings fetched successfully", { data: bookings });
+  }),
 
-      const bookings = await bookingService.getUserBookings(
-        companyId as string,
-        userId as string
-      );
-      console.log(bookings,'bookings');
-      
-      res.json({ bookings });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error fetching user bookings" });
-    }
-  },
+  getOne: asyncHandler(async (req: Request, res: Response) => {
+    const { bookingId } = req.params;
+    const booking = await bookingService.getBookingById(bookingId);
+    successResponse(res, "Booking fetched successfully", { data: booking });
+  }),
+
+  remove: asyncHandler(async (req: Request, res: Response) => {
+    const { bookingId } = req.params;
+    await bookingService.deleteBooking(bookingId);
+    successResponse(res, "Booking deleted successfully");
+  }),
+
+  getReservedTimes: asyncHandler(async (req: Request, res: Response) => {
+    const { companyId, date } = req.params;
+
+    const reservedTimes = await bookingService.getReservedTimesByCompany(
+      new Types.ObjectId(companyId),
+      date
+    );
+
+    successResponse(res, "Reserved times fetched successfully", {
+      data: reservedTimes,
+    });
+  }),
+
+  getUserBookings: asyncHandler(async (req: Request, res: Response) => {
+    const { companyId, userId } = req.params;
+
+    const bookings = await bookingService.getUserBookings(
+      new Types.ObjectId(companyId),
+      new Types.ObjectId(userId)
+    );
+
+    successResponse(res, "User bookings fetched successfully", {
+      data: bookings,
+    });
+  }),
 };

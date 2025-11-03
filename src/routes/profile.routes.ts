@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
-import { updateProfile, getProfile } from "../controllers/profile.controller";
 import { authMiddleware } from "../middleware/auth";
+import { profileController } from "../controllers/profile.controller";
 
 const router = Router();
 
@@ -22,11 +22,11 @@ const upload = multer({ storage });
 
  * Get the authenticated user's profile
  */
-router.get("/profile", authMiddleware, getProfile);
+router.get("/profile", authMiddleware, profileController.getProfile);
 
 /**
  * Update the authenticated user's profile and optionally upload avatar
  */
-router.post("/updateProfile", authMiddleware, upload.single("avatar"), updateProfile);
+router.post("/updateProfile", authMiddleware, upload.single("avatar"),  profileController.updateProfile);
 
 export default router;

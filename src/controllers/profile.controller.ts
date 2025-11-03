@@ -1,17 +1,13 @@
 import { Request, Response } from "express";
 import { User } from "../models/User";
+import { asyncHandler, successResponse } from "../helpers/response.helper";
 
-export const updateProfile = async (req: any, res: Response) => {
-  try {
+export const profileController = {
+  updateProfile: asyncHandler(async (req: any, res: Response) => {
     const avatarFilename = req.file ? req.file.filename : undefined;
     const { description, age, gender } = req.body;
-
-    if (req.file && !req.file.mimetype.startsWith("image/")) {
-      return res.status(400).json({ error: req.t("profile.invalid_avatar") });
-    }
-
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: req.t("profile.not_found") });
+    if (!user) throw new Error("User not found");
 
     user.profile = {
       ...user.profile,
@@ -23,20 +19,12 @@ export const updateProfile = async (req: any, res: Response) => {
 
     await user.save();
 
-    res.status(200).json({
-      message: req.t("profile.update_success"),
-      user,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: req.t("profile.internal_error") });
-  }
-};
+    successResponse(res, "Profile updated successfully", { user });
+  }),
 
-export const getProfile = async (req: any, res: Response) => {
-  try {
+  getProfile: asyncHandler(async (req: any, res: Response) => {
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: req.t("profile.not_found") });
+    if (!user) throw new Error("User not found");
 
     const { password, __v, ...userWithoutPass } = user.toObject();
 
@@ -50,9 +38,9 @@ export const getProfile = async (req: any, res: Response) => {
         : "",
     };
 
-    res.status(200).json({ ...userWithoutPass, profile: fullProfile });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: req.t("profile.internal_error") });
-  }
+    successResponse(res, "Profile fetched successfully", {
+      ...userWithoutPass,
+      profile: fullProfile,
+    });
+  }),
 };
