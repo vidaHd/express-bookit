@@ -20,6 +20,10 @@ export const companyService = {
     return await Company.find();
   },
 
+  async getAllCompaniesByUserId(userId: string) {
+    return await Company.find({ userId }).exec();
+  },
+
   async updateCompany(
     companyId: string,
     data: Partial<{
@@ -31,7 +35,6 @@ export const companyService = {
       description: string;
     }>
   ) {
-    
     return await Company.findByIdAndUpdate(companyId, data, { new: true });
   },
 

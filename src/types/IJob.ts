@@ -1,4 +1,7 @@
-export interface IJob extends Document {
-  name: string;
+export interface IJob {
+  name: {
+    en: string;
+    fa: string;
+  };
   jobCode: string;
 }

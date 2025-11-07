@@ -15,7 +15,7 @@ function generateRandomUrl(length = 8) {
 export const companyController = {
   addCompany: asyncHandler(async (req: any, res: Response) => {
     const { companyName, jobId } = req.body;
-    const userId = req.user?.id;
+    const { userId } = req.params;
 
     const url = `${companyName
       .toLowerCase()
@@ -33,7 +33,11 @@ export const companyController = {
       data: newCompany.toObject(),
     });
   }),
-
+  getAllCompaniesByUserId: asyncHandler(async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const companies = await companyService.getAllCompaniesByUserId(userId);
+    successResponse(res, "Companies fetched successfully", { data: companies });
+  }),
   getAllCompanies: asyncHandler(async (_req: Request, res: Response) => {
     const companies = await companyService.getAllCompanies();
     successResponse(res, "Companies fetched successfully", { data: companies });

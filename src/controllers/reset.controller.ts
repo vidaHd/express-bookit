@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { User } from "../models/User";
 import { asyncHandler, successResponse } from "../helpers/response.helper";
-import { sendSMS } from "../helpers/sms.helper";
+import { sendEmail } from "../helpers/email.helper";
 
 export const resetPasswordController = {
   requestResetPassword: asyncHandler(async (req: Request, res: Response) => {
-    const { oldPassword, newPassword, name } = req.body;
+    const { oldPassword, newPassword, mobileNumber } = req.body;
 
-    const user = await User.findOne({ name });
+    const user = await User.findOne({ mobileNumber });
     if (!user) throw new Error("User not found");
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
@@ -19,7 +19,11 @@ export const resetPasswordController = {
     user.newPasswordTemp = await bcrypt.hash(newPassword, 10);
     await user.save();
 
-    await sendSMS(user.mobileNumber, `کد تغییر رمز شما: ${code}`);
+    await sendEmail(
+      user.email,
+      req.t("auth.verification_code_subject"),
+      req.t("auth.verification_code_email", { name, code })
+    );
 
     successResponse(res, "SMS sent successfully");
   }),
