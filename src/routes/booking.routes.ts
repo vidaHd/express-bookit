@@ -16,12 +16,18 @@ router.get(
 /**
  * Create a new booking
  */
-router.post("/bookings/:companyId/:userId", validationMiddleware(CreateBookingDto), bookingController.create);
+router.post(
+  "/bookings/:companyId/:userId",
+  validationMiddleware(CreateBookingDto),
+  bookingController.create
+);
 
 /**
  * Get a specific booking by ID
  */
 router.get("/bookings/:companyId", bookingController.getAll);
+
+router.put("/bookings/bookingId/:id", bookingController.updateBookingStatus);
 
 /**
  * Get reserved times for a company (for disabling)

@@ -39,4 +39,10 @@ export const bookingService = {
       .populate("serviceId", "title price duration")
       .populate("companyId", "name");
   },
+
+  async updateBookingStatus(id: string, status: string) {
+    return await Booking.findByIdAndUpdate(id, { status }, { new: true })
+      .populate("userId", "name mobileNumber")
+      .populate("serviceId", "title price duration");
+  },
 };

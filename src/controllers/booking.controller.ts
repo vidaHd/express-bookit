@@ -22,7 +22,7 @@ export const bookingController = {
     if (company?.email) {
       await sendEmail(
         company.email,
-        req.t("email.new_booking_subject"), 
+        req.t("email.new_booking_subject"),
         req.t("email.new_booking_body", {
           companyName: company.companyName,
           selectedDate,
@@ -42,7 +42,7 @@ export const bookingController = {
 
     successResponse(res, req.t("booking.fetched_success"), { data: bookings });
   }),
-  
+
   getOne: asyncHandler(async (req: Request, res: Response) => {
     const { bookingId } = req.params;
     const booking = await bookingService.getBookingById(bookingId);
@@ -81,5 +81,33 @@ export const bookingController = {
     successResponse(res, req.t("booking.user_bookings_fetched"), {
       data: bookings,
     });
+  }),
+
+  updateBookingStatus: asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const validStatuses = ["pending", "confirmed", "rejected"];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status value" });
+      }
+
+      const updatedBooking = await bookingService.updateBookingStatus(
+        id,
+        status
+      );
+      if (!updatedBooking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      return res.status(200).json({
+        message: "Booking status updated successfully",
+        data: updatedBooking,
+      });
+    } catch (error) {
+      console.error("Error updating booking status:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   }),
 };
