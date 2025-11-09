@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { resetPasswordController } from "../controllers/reset.controller";
+import { resetPasswordController } from "../controllers/changePassword.controller";
 import { validationMiddleware } from "../middleware";
 import { RequestResetPasswordDto } from "../dto/reset-password.dto";
 

@@ -6,6 +6,7 @@ import {
   VerfifacationCodeDto,
 } from "../dto/auth.dto";
 import { validationMiddleware } from "../middleware";
+import { resetPassword, sendResetCode, verifyResetCode } from "../controllers/resetPassword.controller";
 
 const router = Router();
 
@@ -27,5 +28,9 @@ router.post(
   validationMiddleware(VerfifacationCodeDto),
   vrifactionCode
 );
+
+router.post("/forgot-password", sendResetCode);
+router.post("/verify-reset-code", verifyResetCode);
+router.post("/reset-password", resetPassword);
 
 export default router;
