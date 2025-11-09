@@ -7,7 +7,13 @@
     "login_success": "ورود موفقیت‌آمیز بود",
     "signup_success": "کاربر با موفقیت ساخته شد",
     "verification_code_subject": "کد تأیید شما ",
-    "verification_code_email": "سلام {{name}} عزیز، کد تأیید شما: {{code}}"
+    "verification_code_email": "سلام {{name}} عزیز، کد تأیید شما: {{code}}",
+    "user_not_found": "کاربر یافت نشد.",
+    "verification_code_sent": "کد تأیید با موفقیت ارسال شد.",
+    "code_verified": "کد با موفقیت تأیید شد.",
+    "invalid_code": "کد تأیید نادرست است.",
+    "password_reset_success": "رمز عبور با موفقیت بازنشانی شد.",
+    "sms_code_message": "کد تأیید شما {{code}} است."
   },
   "time": {
     "missing_fields": "companyId و timesByDay الزامی هستند",
@@ -54,7 +60,7 @@
     "new_booking_subject": "رزرو جدید دریافت شد ✅",
     "new_booking_body": "سلام {{companyName}}،\nشما یک رزرو جدید دارید برای تاریخ {{selectedDate}} در ساعت {{selectedTimes}}.\n\nبا احترام،\nتیم Bookit"
   },
-   "booking": {
+  "booking": {
     "created_success": "رزرو با موفقیت ایجاد شد ✅",
     "fetched_success": "رزروها با موفقیت دریافت شدند ✅",
     "deleted_success": "رزرو با موفقیت حذف شد ✅",

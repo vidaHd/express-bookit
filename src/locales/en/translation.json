@@ -7,7 +7,13 @@
     "login_success": "Login successful",
     "signup_success": "User created successfully",
     "verification_code_subject": "Your verification code ",
-    "verification_code_email": "Hello dear {{name}}, your verification code is: {{code}}"
+    "verification_code_email": "Hello dear {{name}}, your verification code is: {{code}}",
+    "user_not_found": "User not found.",
+    "verification_code_sent": "Verification code sent successfully.",
+    "code_verified": "Code verified successfully.",
+    "invalid_code": "Invalid verification code.",
+    "password_reset_success": "Password reset successfully.",
+    "sms_code_message": "Your verification code is {{code}}."
   },
   "time": {
     "missing_fields": "companyId and timesByDay are required",
