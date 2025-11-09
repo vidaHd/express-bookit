@@ -59,6 +59,6 @@ export const vrifactionCode = asyncHandler(
     user.verificationCode = undefined;
     await user.save();
 
-    successResponse(res, "User verified successfully");
+    successResponse(res, req.t("auth.signup_success"), { user });
   }
 );
