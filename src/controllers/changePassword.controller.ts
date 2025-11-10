@@ -13,6 +13,7 @@ export const resetPasswordController = {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) throw new Error("Old password is incorrect");
+console.log(user);
 
     const code = Math.floor(1000 + Math.random() * 9000).toString();
     user.resetCode = code;
@@ -22,7 +23,7 @@ export const resetPasswordController = {
     await sendEmail(
       user.email,
       req.t("auth.verification_code_subject"),
-      req.t("auth.verification_code_email", { name, code })
+      req.t("auth.verification_code_email", { code })
     );
 
     successResponse(res, "SMS sent successfully");

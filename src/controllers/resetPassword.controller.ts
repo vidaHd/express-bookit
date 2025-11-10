@@ -15,13 +15,11 @@ export const sendResetCode = async (req: Request, res: Response) => {
   verificationCodes[mobileNumber] = code;
 
   // await sendSMS(mobileNumber, req.t("auth.sms_code_message", { code }));
-
-  await sendEmail(
-    user.email,
-    req.t("auth.verification_code_subject"),
-    req.t("", { code })
-  );
-
+    await sendEmail(
+      user.email,
+      req.t("auth.verification_code_subject"),
+      req.t("auth.verification_code_email", { code })
+    );
   res.json({ message: req.t("auth.verification_code_sent") });
 };
 

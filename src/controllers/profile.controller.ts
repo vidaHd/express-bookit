@@ -4,9 +4,11 @@ import { asyncHandler, successResponse } from "../helpers/response.helper";
 
 export const profileController = {
   updateProfile: asyncHandler(async (req: any, res: Response) => {
+     const { id } = req.params;
+    const user = await User.findOne({ _id: id });
+
     const avatarFilename = req.file ? req.file.filename : undefined;
     const { description, age, gender } = req.body;
-    const user = await User.findById(req.user.id);
     if (!user) throw new Error("User not found");
 
     user.profile = {
@@ -23,7 +25,8 @@ export const profileController = {
   }),
 
   getProfile: asyncHandler(async (req: any, res: Response) => {
-    const user = await User.findById(req.user.id);
+    const { id } = req.params;
+    const user = await User.findOne({ _id: id });
     if (!user) throw new Error("User not found");
 
     const { password, __v, ...userWithoutPass } = user.toObject();

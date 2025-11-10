@@ -10,7 +10,6 @@ const router = Router();
  */
 router.post(
   "/request-reset-password",
-  validationMiddleware(RequestResetPasswordDto),
   resetPasswordController.requestResetPassword
 );
 

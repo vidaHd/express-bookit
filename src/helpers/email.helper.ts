@@ -10,13 +10,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = async (to: string, subject: string, text: string) => {
+export const sendEmail = async (to?: string, subject?: string, text?: string) => {
   const mailOptions = {
     from: '"Bookit App" <h.vida4471@gmail.com>',
     to,
     subject,
     text,
   };
+console.log(mailOptions);
 
   try {
     await transporter.sendMail(mailOptions);

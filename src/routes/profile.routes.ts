@@ -22,11 +22,11 @@ const upload = multer({ storage });
 
  * Get the authenticated user's profile
  */
-router.get("/profile", authMiddleware, profileController.getProfile);
+router.get("/profile/:id", profileController.getProfile);
 
 /**
  * Update the authenticated user's profile and optionally upload avatar
  */
-router.post("/updateProfile", authMiddleware, upload.single("avatar"),  profileController.updateProfile);
+router.post("/updateProfile/:id", upload.single("avatar"),  profileController.updateProfile);
 
 export default router;
