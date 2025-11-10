@@ -4,12 +4,17 @@ import { asyncHandler, successResponse } from "../helpers/response.helper";
 
 export const profileController = {
   updateProfile: asyncHandler(async (req: any, res: Response) => {
-     const { id } = req.params;
+    const { id } = req.params;
     const user = await User.findOne({ _id: id });
 
     const avatarFilename = req.file ? req.file.filename : undefined;
-    const { description, age, gender } = req.body;
+    const { description, age, gender, name, familyName, email, mobileNumber } =
+      req.body;
     if (!user) throw new Error("User not found");
+    user.name = name ?? user.name;
+    user.familyName = familyName ?? user.familyName;
+    user.email = email ?? user.email;
+    user.mobileNumber = mobileNumber ?? user.mobileNumber;
 
     user.profile = {
       ...user.profile,
@@ -18,7 +23,7 @@ export const profileController = {
       gender: gender ?? user.profile?.gender,
       avatar: avatarFilename ?? user.profile?.avatar,
     };
-
+    
     await user.save();
 
     successResponse(res, "Profile updated successfully", { user });

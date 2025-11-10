@@ -1,32 +1,32 @@
+import fs from "fs";
 import { Router } from "express";
 import multer from "multer";
-import { authMiddleware } from "../middleware/auth";
 import { profileController } from "../controllers/profile.controller";
 
 const router = Router();
 
-/**
- * Configure multer for avatar uploads
- */
+const uploadDir = "uploads/";
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (_req, _file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadDir);
   },
   filename: function (_req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
+
 const upload = multer({ storage });
 
-/**
-
- * Get the authenticated user's profile
- */
 router.get("/profile/:id", profileController.getProfile);
 
-/**
- * Update the authenticated user's profile and optionally upload avatar
- */
-router.post("/updateProfile/:id", upload.single("avatar"),  profileController.updateProfile);
+router.post(
+  "/updateProfile/:id",
+  upload.single("avatar"),
+  profileController.updateProfile
+);
 
 export default router;
