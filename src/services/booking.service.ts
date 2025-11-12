@@ -41,6 +41,20 @@ export const bookingService = {
   },
 
   async updateBookingStatus(id: string, status: string) {
+    if (status === "rejected") {
+      const booking = await Booking.findById(id)
+        .populate("userId", "name mobileNumber")
+        .populate("serviceId", "title price duration");
+
+      if (!booking) {
+        return null;
+      }
+
+      await booking.deleteOne();
+      booking.set("status", status, { strict: false });
+      return booking;
+    }
+
     return await Booking.findByIdAndUpdate(id, { status }, { new: true })
       .populate("userId", "name mobileNumber")
       .populate("serviceId", "title price duration");

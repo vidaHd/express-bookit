@@ -93,16 +93,16 @@ export const bookingController = {
         return res.status(400).json({ message: "Invalid status value" });
       }
 
-      const updatedBooking = await bookingService.updateBookingStatus(
-        id,
-        status
-      );
+      const updatedBooking = await bookingService.updateBookingStatus(id, status);
       if (!updatedBooking) {
         return res.status(404).json({ message: "Booking not found" });
       }
 
       return res.status(200).json({
-        message: "Booking status updated successfully",
+        message:
+          status === "rejected"
+            ? "Booking rejected and removed successfully"
+            : "Booking status updated successfully",
         data: updatedBooking,
       });
     } catch (error) {
