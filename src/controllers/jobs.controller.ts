@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Job } from "../models/Job";
-import { asyncHandler, successResponse, errorResponse } from "../helpers/response.helper";
+import { asyncHandler, successResponse } from "../helpers/response.helper";
 
 export const jobController = {
   getJobs: asyncHandler(async (req: Request, res: Response) => {

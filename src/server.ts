@@ -16,7 +16,7 @@ import i18next from "./config/i18n";
 import { connectDB } from "./config/db";
 
 const app: Application = express();
- // Middleware
+// Middleware
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(middleware.handle(i18next));
@@ -34,8 +34,7 @@ app.use("/", companyService);
 app.use("/", availableTime);
 app.use("/", booking);
 
-
 const PORT = 5000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
