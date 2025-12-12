@@ -10,7 +10,7 @@ import jobRoutes from "./routes/job.routes";
 import availableTime from "./routes/available.time";
 import booking from "./routes/booking.routes";
 
-import middleware from "i18next-http-middleware";
+import { handle } from "i18next-http-middleware";
 import i18next from "./config/i18n";
 
 import { connectDB } from "./config/db";
@@ -19,7 +19,7 @@ const app: Application = express();
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
-app.use(middleware.handle(i18next));
+app.use(handle(i18next));
 
 // MongoDB
 connectDB();

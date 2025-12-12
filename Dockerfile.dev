@@ -2,13 +2,14 @@ FROM node:20
 
 WORKDIR /app
 
-RUN npm install -g pnpm ts-node-dev
-
-COPY package*.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm
+RUN pnpm install
 
 COPY . .
 
+RUN pnpm add -D ts-node-dev
+
 EXPOSE 5000
 
-CMD ["ts-node-dev", "--respawn", "--transpile-only", "src/server.ts"]
+CMD ["pnpm", "dev"]
