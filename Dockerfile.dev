@@ -1,18 +1,15 @@
-FROM node:20
+FROM node:20-bookworm
 
 WORKDIR /app
 
-# نصب pnpm
-RUN npm install -g pnpm
+# Enable pnpm via corepack (installed with Node 20)
+RUN corepack enable
 
-# کپی و نصب dependencies
+# Install dependencies once; source code will be mounted at runtime
 COPY package*.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-# کپی کل پروژه
-COPY . .
-
 EXPOSE 5000
 
-# اجرای ts-node-dev با مسیر فایل اصلی
-CMD ["pnpm", "exec", "ts-node-dev", "--respawn", "--transpile-only", "src/server.ts"]
+# Run the standard dev script for hot reload
+CMD ["pnpm", "dev"]

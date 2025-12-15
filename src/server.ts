@@ -7,7 +7,7 @@ import companyRoutes from "./routes/company.routes";
 import serviceRoutes from "./routes/service.routes";
 import companyService from "./routes/company-service.routes";
 import jobRoutes from "./routes/job.routes";
-import availableTime from "./routes/available.time";
+import availableTime from "./routes/availableTime.routes";
 import booking from "./routes/booking.routes";
 
 import { handle } from "i18next-http-middleware";
