@@ -2,14 +2,11 @@ FROM node:20-bookworm
 
 WORKDIR /app
 
-# Enable pnpm via corepack (installed with Node 20)
 RUN corepack enable
 
-# Install dependencies once; source code will be mounted at runtime
 COPY package*.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 EXPOSE 5000
 
-# Run the standard dev script for hot reload
 CMD ["pnpm", "dev"]
