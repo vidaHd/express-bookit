@@ -2,14 +2,17 @@ FROM node:20
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+# نصب pnpm
 RUN npm install -g pnpm
-RUN pnpm install
 
+# کپی و نصب dependencies
+COPY package*.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# کپی کل پروژه
 COPY . .
-
-RUN pnpm add -D ts-node-dev
 
 EXPOSE 5000
 
-CMD ["pnpm", "dev"]
+# اجرای ts-node-dev با مسیر فایل اصلی
+CMD ["pnpm", "exec", "ts-node-dev", "--respawn", "--transpile-only", "src/server.ts"]

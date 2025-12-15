@@ -10,7 +10,8 @@
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
-    "jsx": "react-jsx",        
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
     "moduleResolution": "node"
   },
   "include": ["src"]
