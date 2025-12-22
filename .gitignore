@@ -14,7 +14,9 @@ pids
 
 # Dependency directories
 node_modules/
-jspm_packages/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
 # Build output
 dist/
@@ -23,6 +25,10 @@ out/
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Build
+dist/
+build/
 
 # Environment variables
 .env
@@ -61,3 +67,14 @@ prisma/migrations/
 
 # Optional: ignore uploads
 uploads/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+
+
+# Docker
+docker-data/
